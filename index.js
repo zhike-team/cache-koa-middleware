@@ -74,7 +74,6 @@ module.exports = (options) => {
       }
     }
 
-    // if hit cache, use cache
     await next();
 
     // if GET request has a 200 OK text response, then set cache
