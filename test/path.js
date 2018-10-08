@@ -89,6 +89,7 @@ describe('Cache expires', function () {
   })
 
   it('2nd expire', function (done) {
+    this.timeout(5000);
     setTimeout(() => {
       request()
         .get('/weird-path')

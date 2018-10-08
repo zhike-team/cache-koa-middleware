@@ -1,6 +1,6 @@
 {
-  "name": "cache-koa-middleware",
-  "version": "1.2.0",
+  "name": "@zhike/cache-koa-middleware",
+  "version": "1.4.0",
   "description": "",
   "main": "index.js",
   "scripts": {

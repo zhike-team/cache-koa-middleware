@@ -15,6 +15,11 @@ module.exports = (options) => {
     throw new Error('options.expireSeconds must be an integer larger than zero');
   }
 
+  const clientMaxAgeHeader = options.clientMaxAgeHeader;
+  if (clientMaxAgeHeader && typeof clientMaxAgeHeader !== 'string') {
+    throw new Error('options.clientMaxAgeHeader must be a string');
+  }
+
   let keyFn = ctx => {
     let sortedKeys = Object.keys(ctx.query).sort();
     let sortedSearchString = sortedKeys.length > 0 ? '?' : '';
@@ -26,8 +31,7 @@ module.exports = (options) => {
   if (options.keyGenerator) {
     if (typeof options.keyGenerator === 'function') {
       keyFn = options.keyGenerator;
-    }
-    else {
+    } else {
       throw new Error('options.keyGenerator must be a function which returns a string as redis key');
     }
   }
@@ -36,8 +40,7 @@ module.exports = (options) => {
   if (options.skipCacheFn) {
     if (typeof options.skipCacheFn === 'function') {
       skipCacheFn = options.skipCacheFn;
-    }
-    else {
+    } else {
       throw new Error('options.skipCacheFn must be a function which returns a Promise');
     }
   }
@@ -46,8 +49,7 @@ module.exports = (options) => {
   if (options.commandTimeout) {
     if (!(Number.isInteger(options.commandTimeout) && options.commandTimeout > 0)) {
       throw new Error('options.commandTimeout must be an integer larger than zero');
-    }
-    else {
+    } else {
       commandTimeout = options.commandTimeout;
     }
   }
@@ -65,11 +67,16 @@ module.exports = (options) => {
         if (responseInCache) {
           let response = JSON.parse(responseInCache);
           ctx.set(response.headers);
+          if (clientMaxAgeHeader) {
+            let maxAge = await redis.ttl(redisKey).timeout(commandTimeout);
+            if (maxAge > 0) {
+              ctx.set(clientMaxAgeHeader, maxAge);
+            }
+          }
           ctx.body = response.body;
           return;
         }
-      }
-      catch (e) {
+      } catch (e) {
         // failed to get cache, move on
       }
     }
