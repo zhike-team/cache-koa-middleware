@@ -44,7 +44,7 @@ function clearCacheAndCounter(done) {
   })
 }
 
-describe.only('Custom TTL header', function () {
+describe('Custom TTL header', function () {
   before('clear cache and counter', clearCacheAndCounter)
 
   it('1st', function (done) {
@@ -54,7 +54,7 @@ describe.only('Custom TTL header', function () {
       .end(done)
   })
 
-  it('1st', function (done) {
+  it('2nd', function (done) {
     this.timeout(5000);
     setTimeout(() => {
       request()
